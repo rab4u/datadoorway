@@ -40,3 +40,16 @@ curl --location --request POST 'http://localhost:8999/v1/send \
       }],
 }'
 ```
+
+### Key Features
+
+- Inbuilt Auth using EasyAuth
+- Send data to multiple sources simultaneously 
+- Validations like
+  
+  - CORS
+  - Schema checks 
+  - Regex based data validations
+  - Payload checks (size, content-type, ...)
+- Regex based routing on headers / data fields 
+- Supports custom connectors 

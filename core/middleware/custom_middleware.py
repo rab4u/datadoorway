@@ -4,14 +4,14 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
-from core.settings.router_settings import RouterSettings
+from core.settings.publisher_settings import PublisherSettings
 from core.settings.schema_settings import SchemaSettings
 from core.settings.security_settings import SecuritySettings
 from core.security.jwt_authorization import JWTAuthorization
 
 
 class CustomMiddleware:
-    def __init__(self, router_settings: RouterSettings,
+    def __init__(self, router_settings: PublisherSettings,
                  security_settings: SecuritySettings,
                  schema_settings: SchemaSettings):
         """
@@ -25,9 +25,8 @@ class CustomMiddleware:
         self.schema_settings = schema_settings
 
         self.jwt_authorization = JWTAuthorization(settings=self.security_settings) if \
-            security_settings.enable_authorization else None
+            security_settings.security_enable_authorization else None
 
-        self.jwt_authorization.print_settings()
 
     async def __call__(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """

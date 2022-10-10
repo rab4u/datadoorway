@@ -3,7 +3,7 @@ from pydantic import (BaseSettings)
 
 class SecuritySettings(BaseSettings):
 
-    enable_authorization: bool = True
+    security_enable_authorization: bool = True
     authjwt_secret_key: str = 'headers'
     authjwt_public_key: str = None
     authjwt_private_key: str = None

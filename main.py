@@ -1,26 +1,21 @@
 from fastapi import FastAPI
-from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
-from core.middleware.custom_middleware import CustomMiddleware
-from core.settings.router_settings import RouterSettings
-from core.settings.schema_settings import SchemaSettings
-from core.settings.security_settings import SecuritySettings
-from core.utilities.basics import file_exists
+from API.dependencies.router_dependencies import RouterDependencies
+from API.routers.publish import Publish
+from core.settings.settings import Settings
+from core.utilities.basics import get_env_file
+
 
 app = FastAPI()
-env_file = "prod.env"
 
-security_settings = SecuritySettings(_env_file=file_exists(file_path=env_file), _env_file_encoding='utf-8')
-router_settings = RouterSettings(_env_file=file_exists(file_path=env_file), _env_file_encoding='utf-8')
-schema_settings = SchemaSettings(_env_file=file_exists(file_path=env_file), _env_file_encoding='utf-8')
+env_file = get_env_file()
+settings = Settings(env_file=env_file)
 
-custom_middleware = CustomMiddleware(router_settings=RouterSettings(),
-                                     schema_settings=SchemaSettings(),
-                                     security_settings=SecuritySettings())
-
-app.add_middleware(BaseHTTPMiddleware, dispatch=custom_middleware)
+# Publisher router initialization
+dependencies = RouterDependencies(settings=settings).get_publish_router_dependencies()
+publish = Publish(settings=settings, dependencies=dependencies)
+app.include_router(router=publish.router)
 
 
 @app.get("/")

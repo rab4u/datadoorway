@@ -22,3 +22,15 @@ def get_env_file() -> str:
     env_file = os.environ['ENV_FILE']
     return file_exists(file_path=env_file)
 
+
+def tuple_list_to_dict(tuple_list: list[tuple]) -> dict:
+    """
+    Convert list of tuples to dict object
+    :param tuple_list:
+    :return: dict
+    """
+    data = {}
+    for key, val in tuple_list:
+        data.setdefault(key, []).append(val)
+
+    return data

@@ -14,8 +14,9 @@ class SchemaValidations:
         """
         self.settings = settings
 
-    def __call__(self, schema_id: str = Query(
-        description="schema id required to verify the schema of the data. Format : namespace.name.version",
+    async def __call__(self, schema_id: str = Query(
+        default=None,
+        description="schema id required to verify the schema of the data. Format : namespace.name.version"
     )):
         if not re.match(self.settings.schema_id_format, schema_id):
             raise HTTPException(

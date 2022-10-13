@@ -7,7 +7,7 @@ from starlette.responses import Response
 from core.settings.publisher_settings import PublisherSettings
 from core.settings.schema_settings import SchemaSettings
 from core.settings.security_settings import SecuritySettings
-from core.security.jwt_authorization import JWTAuthorization
+from core.security.jwt_bearer_authorization import JWTBearerAuthorization
 
 
 class CustomMiddleware:
@@ -24,7 +24,7 @@ class CustomMiddleware:
         self.security_settings = security_settings
         self.schema_settings = schema_settings
 
-        self.jwt_authorization = JWTAuthorization(settings=self.security_settings) if \
+        self.jwt_authorization = JWTBearerAuthorization(settings=self.security_settings) if \
             security_settings.security_enable_authorization else None
 
 

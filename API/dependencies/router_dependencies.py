@@ -1,8 +1,8 @@
-from typing import Optional, List, Tuple
+from typing import Optional, List
 
 from fastapi import Depends
 
-from core.security.jwt_authorization import verify_token
+from core.security.jwt_bearer_authorization import JWTBearerAuthorization
 from core.settings.settings import Settings
 from core.validations.schema_validations import SchemaValidations
 
@@ -23,7 +23,8 @@ class RouterDependencies:
         dependencies: list = []
 
         if self.settings.security_enable_authorization:
-            dependencies.append(Depends(verify_token))
+            jwt_authorization = JWTBearerAuthorization(settings=self.settings)
+            dependencies.append(Depends(jwt_authorization))
         if self.settings.schema_enable_validations:
             schema_validations = SchemaValidations(settings=self.settings)
             dependencies.append(Depends(schema_validations))
@@ -35,24 +36,26 @@ class RouterDependencies:
         Prepare list of dependencies required for publisher endpoints
         :return: Optional[List]
         """
-        dependency_list: list = []
+        dependencies: list = []
 
         if self.settings.security_enable_authorization:
-            dependency_list.append(Depends(verify_token))
+            jwt_authorization = JWTBearerAuthorization(settings=self.settings)
+            dependencies.append(Depends(jwt_authorization))
 
-        return dependency_list if len(dependency_list) != 0 else None
+        return dependencies if len(dependencies) != 0 else None
 
     def get_admin_router_dependencies(self) -> Optional[List]:
         """
         Prepare list of dependencies required for admin endpoints
         :return: Optional[List]
         """
-        dependency_list: list = []
+        dependencies: list = []
 
         if self.settings.security_enable_authorization:
-            dependency_list.append(Depends(verify_token))
+            jwt_authorization = JWTBearerAuthorization(settings=self.settings)
+            dependencies.append(Depends(jwt_authorization))
 
-        return dependency_list if len(dependency_list) != 0 else None
+        return dependencies if len(dependencies) != 0 else None
 
     def get_metrics_router_dependencies(self) -> Optional[List]:
         """

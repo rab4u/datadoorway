@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from API.metadata.paths import Paths
 from API.metadata.tags import Tags
 from core.settings.settings import Settings
+from core.utilities.basics import tuple_list_to_dict
 from core.validations.publisher_validations import PublisherValidations
 
 
@@ -49,4 +50,5 @@ class Publish:
         """
         post the data to the publishers
         """
-        return {"all_publishers": self.settings.publishers, "requested_publisher": request.query_params.multi_items()}
+        return {"all_publishers": self.settings.publishers, "requested_publisher": tuple_list_to_dict(
+            request.query_params.multi_items())}

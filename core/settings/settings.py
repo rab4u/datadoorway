@@ -1,6 +1,7 @@
 import json
 
 import dotenv
+from pydantic.types import SecretStr
 
 from core.settings.publisher_settings import PublisherSettings
 from core.settings.schema_settings import SchemaSettings
@@ -20,7 +21,7 @@ class Settings(
             _env_file_encoding=env_file_encoding
         )
 
-    def update_settings(self, key: str, value: str | set | list):
+    def update_settings(self, key: str, value: str | set | list | dict | SecretStr):
         """
         updates the env file
         :param key: key of the environment variable to update
@@ -30,11 +31,13 @@ class Settings(
         current_value = getattr(self, key.lower())
 
         if type(current_value) == set:
+            setattr(self, key.lower(), value)
             value = json.dumps(list(value))
-        elif type(current_value) == list:
+        elif type(current_value) in (list, dict):
+            setattr(self, key.lower(), value)
             value = json.dumps(value)
-
-        setattr(self, key.lower(), value)
+        elif type(current_value) == SecretStr:
+            setattr(self, key.lower(), SecretStr(value))
 
         env_file = get_env_file()
         dotenv.load_dotenv(dotenv_path=env_file)

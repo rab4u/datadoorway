@@ -26,7 +26,7 @@ class JWTBearerValidations:
         try:
             scopes_string: str = self.token["scope"]
         except KeyError:
-            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST,
+            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
                                 detail=f"Exception raised while decoding JWT token. Details: Missing JWT scope")
 
         if not re.match(self.jwt_scope_format, scopes_string):

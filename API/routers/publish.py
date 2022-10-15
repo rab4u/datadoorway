@@ -2,6 +2,7 @@ from typing import Optional, List
 
 from fastapi import APIRouter, Depends, Request
 
+from API.metadata.doc_strings import DocStrings
 from API.metadata.paths import Paths
 from API.metadata.tags import Tags
 from API.dependencies.publisher_dependencies import PublisherDependencies
@@ -29,19 +30,22 @@ class Publish:
             path=str(Paths.PUBLISH.value),
             endpoint=self.get_publishers,
             dependencies=publisher_dependencies.endpoint_get_dependencies(),
-            methods=["GET"]
+            methods=["GET"],
+            responses=DocStrings.PUBLISHER_GET_ENDPOINT_DOCS
         )
 
         self.router.add_api_route(
             path=str(Paths.PUBLISH.value),
             endpoint=self.post_publishers,
             methods=["POST"],
-            dependencies=publisher_dependencies.endpoint_post_dependencies()
+            dependencies=publisher_dependencies.endpoint_post_dependencies(),
+            responses=DocStrings.PUBLISHER_POST_ENDPOINT_DOCS
+
         )
 
     async def get_publishers(self) -> dict:
         """
-        gets the list of publishers
+        This endpoint will return a json with the list of publishers
         """
         return {"publishers": self.settings.publisher_publishers}
 

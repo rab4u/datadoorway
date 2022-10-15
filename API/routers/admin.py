@@ -5,6 +5,7 @@ from fastapi import APIRouter
 
 from API.metadata.paths import Paths
 from API.metadata.tags import Tags
+from core.models.setting_model import SettingModel
 from core.settings.settings import Settings
 
 
@@ -27,8 +28,22 @@ class Admin:
             methods=["GET"]
         )
 
+        self.router.add_api_route(
+            path=str(Paths.ADMIN.value),
+            endpoint=self.update_settings,
+            dependencies=None,
+            methods=["PUT"]
+        )
+
     async def get_settings(self) -> dict:
         """
         get the settings
         """
         return {"settings": self.settings}
+
+    async def update_settings(self, setting: SettingModel) -> dict:
+        """
+        update the settings with given key, value. Automatically updates the env file
+        """
+        self.settings.update_settings(key=setting.key, value=setting.value)
+        return {"updated_settings": self.settings}

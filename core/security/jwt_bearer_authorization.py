@@ -2,11 +2,12 @@ from http import HTTPStatus
 from typing import Mapping
 
 import jwt
-from fastapi import Depends, Header, HTTPException
+from fastapi import HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Request
 
 from core.settings.security_settings import SecuritySettings
+from core.validations.jwt_bearer_validations import JWTBearerValidations
 
 
 class JWTBearerAuthorization(HTTPBearer):
@@ -23,12 +24,21 @@ class JWTBearerAuthorization(HTTPBearer):
     async def __call__(self, request: Request):
         credentials: HTTPAuthorizationCredentials = await super(JWTBearerAuthorization, self).__call__(request)
         decoded_token = self.decode_jwt(credentials.credentials)
-        print(decoded_token)
-        print(self.settings.security_jwt_claims)
+        jwt_validations = JWTBearerValidations(
+            settings=self.settings,
+            token=decoded_token,
+            endpoint=request.url.path,
+            method=request.method
+        )
+        jwt_validations.validate_scope()
 
     def decode_jwt(self, token: str) -> Mapping:
         try:
-            decoded_token = jwt.decode(jwt=token, key=self.settings.security_jwt_secret_key)
+            decoded_token = jwt.decode(
+                jwt=token,
+                key=self.settings.security_jwt_secret_key.get_secret_value(),
+                algorithms=self.settings.security_jwt_algorithms
+            )
             return decoded_token
         except Exception as e:
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,

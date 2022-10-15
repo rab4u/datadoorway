@@ -3,6 +3,8 @@ from http import HTTPStatus
 from fastapi import HTTPException, Query
 import re
 
+from pydantic import Required
+
 from core.settings.settings import Settings
 
 
@@ -15,7 +17,7 @@ class SchemaValidations:
         self.settings = settings
 
     async def __call__(self, schema_id: str = Query(
-        default=None,
+        default=Required,
         description="schema id required to verify the schema of the data. Format : namespace.name.version"
     )):
         if not re.match(self.settings.schema_id_format, schema_id):

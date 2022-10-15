@@ -11,7 +11,7 @@ class RouterDependencies:
     def __init__(self, settings: Settings):
         """
         Constructor for MiddlewareBuilder
-        :param settings: environment file to get the settings
+        :param settings: environment settings
         """
         self.settings = settings
 
@@ -25,9 +25,6 @@ class RouterDependencies:
         if self.settings.security_enable_authorization:
             jwt_authorization = JWTBearerAuthorization(settings=self.settings)
             dependencies.append(Depends(jwt_authorization))
-        if self.settings.schema_enable_validations:
-            schema_validations = SchemaValidations(settings=self.settings)
-            dependencies.append(Depends(schema_validations))
 
         return dependencies if len(dependencies) != 0 else None
 

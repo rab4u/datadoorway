@@ -1,14 +1,34 @@
+from typing import Optional, List
+
 import dotenv
-from core.utilities.basics import get_env_file
+from fastapi import APIRouter
 
-_env_file = get_env_file()
+from API.metadata.paths import Paths
+from API.metadata.tags import Tags
+from core.settings.settings import Settings
 
 
-async def update_env(key: str, value: str) -> dict:
-    """
-    updates the env file
-    """
-    dotenv.load_dotenv(dotenv_path=_env_file)
-    dotenv.set_key(dotenv_path=_env_file, key_to_set=key, value_to_set=value)
+class Admin:
+    def __init__(self, settings: Settings, dependencies: Optional[List]):
+        """
+        Constructor for publish endpoint
+        :param settings: environment settings
+        :param dependencies:
+        """
+        self.settings = settings
 
-    return {"status": "success"}
+        self.router = APIRouter(tags=[str(Tags.ADMIN.value)], dependencies=dependencies) \
+            if dependencies else APIRouter(tags=[str(Tags.ADMIN.value)])
+
+        self.router.add_api_route(
+            path=str(Paths.ADMIN.value),
+            endpoint=self.get_settings,
+            dependencies=None,
+            methods=["GET"]
+        )
+
+    async def get_settings(self) -> dict:
+        """
+        get the settings
+        """
+        return {"settings": self.settings}

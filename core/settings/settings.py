@@ -6,13 +6,15 @@ from pydantic.types import SecretStr
 from core.settings.publisher_settings import PublisherSettings
 from core.settings.schema_settings import SchemaSettings
 from core.settings.security_settings import SecuritySettings
+from core.settings.metrics_settings import MetricsSettings
 from core.utilities.basics import get_env_file
 
 
 class Settings(
     PublisherSettings,
     SchemaSettings,
-    SecuritySettings
+    SecuritySettings,
+    MetricsSettings
 ):
 
     def __init__(self, env_file: str, env_file_encoding: str = "utf-8"):
@@ -21,23 +23,23 @@ class Settings(
             _env_file_encoding=env_file_encoding
         )
 
-    def update_settings(self, key: str, value: str | set | list | dict | SecretStr):
+    def update_setting(self, key: str, value: str | set | list | dict | SecretStr):
         """
-        updates the env file
+        updates a single setting. Automatically also updates in env file
         :param key: key of the environment variable to update
         :param value: value of the environment variable to update
-        :return:
         """
-        current_value = getattr(self, key.lower())
+        key_lower = key.lower()
+        current_value = getattr(self, key_lower)
 
         if type(current_value) == set:
-            setattr(self, key.lower(), value)
+            setattr(self, key_lower, value)
             value = json.dumps(list(value))
         elif type(current_value) in (list, dict):
-            setattr(self, key.lower(), value)
+            setattr(self, key_lower, value)
             value = json.dumps(value)
         elif type(current_value) == SecretStr:
-            setattr(self, key.lower(), SecretStr(value))
+            setattr(self, key_lower, SecretStr(value))
 
         env_file = get_env_file()
         dotenv.load_dotenv(dotenv_path=env_file)
@@ -50,4 +52,4 @@ if __name__ == '__main__':
     )
 
     val = {"console", "file", "kafka", "s3", "gcs", "bigquery", "athena"}
-    s.update_settings(key="publisher_publishers", value=val)
+    s.update_setting(key="publisher_publishers", value=val)

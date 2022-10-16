@@ -23,16 +23,16 @@ class JWTBearerAuthorization(HTTPBearer):
 
     async def __call__(self, request: Request):
         credentials: HTTPAuthorizationCredentials = await super(JWTBearerAuthorization, self).__call__(request)
-        decoded_token = self.decode_jwt(credentials.credentials)
+        decoded_token = await self.decode_jwt(credentials.credentials)
         jwt_validations = JWTBearerValidations(
             settings=self.settings,
             token=decoded_token,
             endpoint=request.url.path,
             method=request.method
         )
-        jwt_validations.validate_scope()
+        await jwt_validations.validate_scope()
 
-    def decode_jwt(self, token: str) -> Mapping:
+    async def decode_jwt(self, token: str) -> Mapping:
         try:
             decoded_token = jwt.decode(
                 jwt=token,

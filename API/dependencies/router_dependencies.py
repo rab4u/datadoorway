@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from core.security.jwt_bearer_authorization import JWTBearerAuthorization
 from core.settings.settings import Settings
-from core.validations.schema_validations import SchemaValidations
+from core.validations.admin_validations import AdminValidations
 
 
 class RouterDependencies:
@@ -51,6 +51,9 @@ class RouterDependencies:
         if self.settings.security_enable_authorization:
             jwt_authorization = JWTBearerAuthorization(settings=self.settings)
             dependencies.append(Depends(jwt_authorization))
+
+        admin_validations = AdminValidations(settings=self.settings)
+        dependencies.append(Depends(admin_validations))
 
         return dependencies if len(dependencies) != 0 else None
 

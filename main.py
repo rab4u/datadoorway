@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from starlette.responses import FileResponse, HTMLResponse
 
 from API.dependencies.router_dependencies import RouterDependencies
+from API.metadata.doc_strings import DocStrings
+from API.metadata.tags import Tags
 from API.routers.admin import Admin
 from API.routers.publish import Publish
 from core.settings.settings import Settings
@@ -20,6 +22,7 @@ app = FastAPI(
         "name": license_info,
         "url": "https://github.com/rab4u/datadoorway/blob/main/LICENSE",
     },
+
 )
 
 env_file = get_env_file()
@@ -36,7 +39,8 @@ admin = Admin(settings=settings, dependencies=dependencies)
 app.include_router(router=admin.router)
 
 
-@app.get("/")
+@app.get("/", responses=DocStrings.ROOT_ENDPOINT_DOCS,
+         response_class=HTMLResponse, tags=[str(Tags.ROOT.value)])
 async def root():
     html_content = f"""
     <html>

@@ -22,12 +22,18 @@ class JWTBearerValidations:
         self.method = method
         self.jwt_scope_format: str = r"^((?:[a-z]+:[a-z]+)\s?)+$"
 
-    def validate_scope(self):
+    async def validate_scope(self):
         try:
             scopes_string: str = self.token["scope"]
         except KeyError:
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
                                 detail=f"Exception raised while decoding JWT token. Details: Missing JWT scope")
+
+        try:
+            self.token["exp"]
+        except KeyError:
+            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
+                                detail=f"Exception raised while decoding JWT token. Details: Missing exp claim")
 
         if not re.match(self.jwt_scope_format, scopes_string):
             raise HTTPException(
@@ -40,7 +46,7 @@ class JWTBearerValidations:
         scopes: list[str] = scopes_string.split(" ")
         invalid = set(scopes).issubset(
             self.settings.security_jwt_scopes.union(
-                self.settings.security_jwt_global_scopes
+                self.settings.security_jwt_admin_scopes
             ))
 
         if not invalid:
@@ -53,7 +59,7 @@ class JWTBearerValidations:
         valid_scopes = {f"{self.endpoint[1:]}:{access}" for access in self.settings.security_method_access_rights[
             self.method]}
 
-        matching_scopes = set(scopes).intersection(valid_scopes.union(self.settings.security_jwt_global_scopes))
+        matching_scopes = set(scopes).intersection(valid_scopes.union(self.settings.security_jwt_admin_scopes))
 
         if not matching_scopes:
             raise HTTPException(

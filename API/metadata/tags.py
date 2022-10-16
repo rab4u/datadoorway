@@ -6,3 +6,4 @@ class Tags(Enum):
     VALIDATIONS = "validations"
     ADMIN = "admin"
     METRICS = "metrics"
+    ROOT = "root"

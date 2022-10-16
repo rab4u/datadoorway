@@ -1,12 +1,14 @@
 from typing import Optional, List
 
-import dotenv
 from fastapi import APIRouter
 
 from API.metadata.paths import Paths
 from API.metadata.tags import Tags
+from API.metadata.doc_strings import DocStrings
+
 from core.models.setting_model import SettingModel
 from core.settings.settings import Settings
+from core.validations.admin_validations import AdminValidations
 
 
 class Admin:
@@ -18,21 +20,25 @@ class Admin:
         """
         self.settings = settings
 
-        self.router = APIRouter(tags=[str(Tags.ADMIN.value)], dependencies=dependencies) \
-            if dependencies else APIRouter(tags=[str(Tags.ADMIN.value)])
+        self.router = APIRouter(
+            tags=[str(Tags.ADMIN.value)],
+            dependencies=dependencies,
+        ) if dependencies else APIRouter(tags=[str(Tags.ADMIN.value)])
 
         self.router.add_api_route(
             path=str(Paths.ADMIN.value),
             endpoint=self.get_settings,
             dependencies=None,
-            methods=["GET"]
+            methods=["GET"],
+            responses=DocStrings.ADMIN_GET_ENDPOINT_DOCS
         )
 
         self.router.add_api_route(
             path=str(Paths.ADMIN.value),
-            endpoint=self.update_settings,
+            endpoint=self.update_setting,
             dependencies=None,
-            methods=["PUT"]
+            methods=["PUT"],
+            responses=DocStrings.ADMIN_PUT_ENDPOINT_DOCS
         )
 
     async def get_settings(self) -> dict:
@@ -41,9 +47,11 @@ class Admin:
         """
         return {"settings": self.settings}
 
-    async def update_settings(self, setting: SettingModel) -> dict:
+    async def update_setting(self, setting: SettingModel) -> dict:
         """
         update the settings with given key, value. Automatically updates the env file
         """
-        self.settings.update_settings(key=setting.key, value=setting.value)
+        admin_validations = AdminValidations(settings=self.settings)
+        await admin_validations.validate_setting(key=setting.key)
+        self.settings.update_setting(key=setting.key, value=setting.value)
         return {"updated_settings": self.settings}

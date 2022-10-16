@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import List
 
 from fastapi import HTTPException, Query
 from pydantic import Required
@@ -11,7 +10,7 @@ class PublisherValidations:
     def __init__(self, settings: PublisherSettings):
         """
         Constructor to VerifyPublisher
-        **param** settings: Setting Object
+        :param settings: PublisherSettings Object
         """
         self.settings = settings
 

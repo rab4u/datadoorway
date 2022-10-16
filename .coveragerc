@@ -1,0 +1,10 @@
+[run]
+omit =
+    # ignore from coverage
+    tests/*
+    */__init__.py
+    main.py
+
+
+[html]
+directory = coverage/html_report/

@@ -2,36 +2,11 @@
 DataDoorway simplifies your data transfer in the data multiverse.
 ######  For example sending data from a microservice to Kafka
 ```
-curl --location --request POST 'http://localhost:8999/v1/kafka \
---header 'Content-Type: application/json' \
---data-raw '[{
-      "event": {
-        "order_id" : 1234
-        "item" : "door"
-        "price" : 150
-        "currency" : "dollar"
-      }],
-}'
-```
-###### For example sending data from a microservice to AWS S3
-```
-curl --location --request POST 'http://localhost:8999/v1/s3 \
---header 'Content-Type: application/json' \
---data-raw '[{
-      "event": {
-        "order_id" : 1234
-        "item" : "door"
-        "price" : 150
-        "currency" : "dollar"
-      }],
-}'
-```
-###### For example sending data from a microservice to multiple sources
-```
-curl --location --request POST 'http://localhost:8999/v1/send \
---header 'Content-Type: application/json' \
---header 'X-Source-List: kafka,s3,bigquery' \
---data-raw '[{
+curl -X 'POST' \
+  'http://localhost:8000/publish?publishers=kafka&publishers=s3&backup_publisher=bigquery&schema_id=sales.order.vq' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE2NjYyMjQwMDAsInNjb3BlIjoiZGQ6YWRtaW4gcHVibGlzaDp3cml0ZSBtZXRyaWNzOnJlYWQifQ.q-Fncgu9LhHN49mUZ-c4DkaVtz0TyEIAedxyJKHZcVE' \
+  -d '[{
       "event": {
         "order_id" : 1234
         "item" : "door"
@@ -43,10 +18,9 @@ curl --location --request POST 'http://localhost:8999/v1/send \
 
 ### Key Features
 
-- Inbuilt Auth using EasyAuth
+- Authorization using JWT Token
 - Send data to multiple sources simultaneously 
 - Validations like
-  
   - CORS
   - Schema checks 
   - Regex based data validations

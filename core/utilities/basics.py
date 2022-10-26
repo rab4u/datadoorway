@@ -19,7 +19,11 @@ def get_env_file() -> str:
     get the environment file path from ENV
     :return: file_path: if file exists
     """
-    env_file = os.environ['ENV_FILE']
+    try:
+        env_file = os.environ['ENV_FILE']
+    except KeyError as e:
+        raise Exception("Environmental variable `ENV_FILE` is missing. "
+                        "Please run the command : export ENV_FILE=test.env")
     return file_exists(file_path=env_file)
 
 

@@ -30,7 +30,10 @@ class JWTBearerAuthorization(HTTPBearer):
             endpoint=request.url.path,
             method=request.method
         )
-        await jwt_validations.validate_scope()
+        await jwt_validations.validate_jwt_token()
+
+        if self.settings.security_enable_scopes:
+            await jwt_validations.validate_jwt_scopes()
 
     async def decode_jwt(self, token: str) -> Mapping:
         try:

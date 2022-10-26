@@ -22,47 +22,43 @@ class JWTBearerValidations:
         self.method = method
         self.jwt_scope_format: str = r"^((?:[a-z]+:[a-z]+)\s?)+$"
 
-    async def validate_scope(self):
+    async def validate_jwt_scopes(self):
         try:
-            scopes_string: str = self.token["scope"]
-        except KeyError:
+            scopes_string: str = self.token["scopes"]
+        except KeyError as e:
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                                detail=f"Exception raised while decoding JWT token. Details: Missing JWT scope")
-
-        try:
-            self.token["exp"]
-        except KeyError:
-            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                                detail=f"Exception raised while decoding JWT token. Details: Missing exp claim")
+                                detail=f"Exception raised while decoding JWT token. Details: Missing JWT scopes")
 
         if not re.match(self.jwt_scope_format, scopes_string):
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED,
-                detail=f"Exception raised while decoding JWT token. Allowed JWT scope format:"
+                detail=f"Exception raised while decoding JWT token. Allowed JWT scopes format:"
                        f"'<endpoint>:<role> <endpoint>:<role> <endpoint>:<role> ...'. "
                        f"Example: 'user:read user:write'"
             )
 
         scopes: list[str] = scopes_string.split(" ")
-        invalid = set(scopes).issubset(
-            self.settings.security_jwt_scopes.union(
-                self.settings.security_jwt_admin_scopes
-            ))
+        valid_scopes: set[str] = {f"{self.endpoint[1:]}:{self.method.lower()}"}.union(
+            self.settings.security_method_access_rights[self.method]
+        )
 
-        if not invalid:
-            raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED,
-                detail=f"Exception raised while decoding JWT token. Invalid JWT scope. "
-                       f"Allowed JWT scopes: {self.settings.security_jwt_scopes}"
-            )
-
-        valid_scopes = {f"{self.endpoint[1:]}:{access}" for access in self.settings.security_method_access_rights[
-            self.method]}
-
-        matching_scopes = set(scopes).intersection(valid_scopes.union(self.settings.security_jwt_admin_scopes))
+        matching_scopes = set(scopes).intersection(valid_scopes)
 
         if not matching_scopes:
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED,
                 detail=f"Exception raised while decoding JWT token. Insufficient permissions"
             )
+
+    async def validate_jwt_token(self):
+        try:
+            self.token["exp"]
+        except KeyError:
+            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
+                                detail=f"Exception raised while decoding JWT token. Details: Missing 'exp' in token")
+
+        try:
+            self.token["sub"]
+        except KeyError:
+            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
+                                detail=f"Exception raised while decoding JWT token. Details: Missing 'sub' in token")

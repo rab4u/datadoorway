@@ -1,3 +1,4 @@
+[Work in progress] - Not yet ready for use 
 # <img src="ddlogo.png" width="70px" height="90px"> DataDoorway (DD)
 DataDoorway simplifies your data transfer in the data multiverse.
 ######  For example sending data from a microservice to Kafka

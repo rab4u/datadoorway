@@ -8,3 +8,4 @@ class SchemaSettings(BaseSettings):
     schema_internal_path: str = None
 
     # TODO: Add schema registry support and apicurio registry support
+    

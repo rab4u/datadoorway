@@ -40,7 +40,7 @@ class PublisherValidations:
 
         if backup_publisher and backup_publisher not in self.settings.publisher_publishers:
             raise HTTPException(status_code=HTTPStatus.BAD_REQUEST,
-                                detail=f"Query param is invalid. Allowed backup_publisher values:"
-                                       f"Provided backup_publisher value: {backup_publisher}. "
-                                       f" {self.settings.publisher_publishers}"
+                                detail=f"Query param is invalid."
+                                       f" Provided backup_publisher value: {backup_publisher}. "
+                                       f" Allowed backup_publisher values: {self.settings.publisher_publishers}"
                                 )

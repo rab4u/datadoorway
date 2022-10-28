@@ -1,7 +1,8 @@
 from http import HTTPStatus
 from typing import Optional, List
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Body
+from pydantic.types import Json
 
 from API.dependencies.publisher_dependencies import PublisherDependencies
 from API.metadata.doc_strings import DocStrings
@@ -48,9 +49,9 @@ class Publish:
     async def get_publishers(self) -> dict:
         return {"publishers": self.settings.publisher_publishers}
 
-    async def post_publishers(self, request: Request) -> dict:
+    async def post_publishers(self, request: Request, payload: dict = Body(example={"event": "hello"})) -> dict:
         """
         post the data to the publishers like kafka, s3, gcs,...
         """
         return {"all_publishers": self.settings.publisher_publishers, "requested_publisher": tuple_list_to_dict(
-            request.query_params.multi_items())}
+            request.query_params.multi_items()), "payload": payload}

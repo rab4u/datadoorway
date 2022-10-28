@@ -155,3 +155,79 @@ class DocStrings:
                                             }
                                         }
                                     } | COMMON_ENDPOINT_DOCS
+
+    SCHEMA_GET_ENDPOINT_DOCS: dict = {
+                                         HTTPStatus.OK.real: {
+                                             "description": "Returns the schema for specified schema_id",
+                                             "content": {
+                                                 "application/json": {
+                                                     "example": {
+                                                         "type": "object",
+                                                         "properties": {
+                                                             "name": {"type": "string", "minLength": 2,
+                                                                      "maxLength": 50},
+                                                             "age": {"type": "number", "minimum": 10,
+                                                                     "exclusiveMaximum": 100},
+                                                             "email": {"type": "string", "format": "email"},
+                                                             "created_on": {"type": "string", "format": "date-time"},
+                                                             "mobile_number": {"type": "string", "minLength": 9,
+                                                                               "pattern": "^[0-9]*$"}
+                                                         },
+                                                         "required": ["age", "name", "email"]
+                                                     }
+                                                 }
+                                             }
+                                         },
+                                         HTTPStatus.BAD_REQUEST.real: {
+                                             "description": "Raises when provided schema_id is invalid "
+                                                            "or when schema for schema id is not found",
+                                             "content": {
+                                                 "application/json": {
+                                                     "example": {
+                                                         "detail": "Query param is invalid. Allowed schema_id format "
+                                                                   ": root/subject/name. Example: "
+                                                                   "users/mobile/ios.json "
+                                                     }
+                                                 }
+                                             }
+                                         }
+                                     } | COMMON_ENDPOINT_DOCS
+
+    SCHEMA_POST_ENDPOINT_DOCS: dict = {
+                                          HTTPStatus.OK.real: {
+                                              "description": "Returns the success message",
+                                              "content": {
+                                                  "application/json": {
+                                                      "example": {
+                                                          "detail": "Successfully updated the schema with "
+                                                                    "schema id: users/mobile/android"
+                                                      }
+                                                  }
+                                              }
+                                          },
+                                          HTTPStatus.BAD_REQUEST.real: {
+                                              "description": "Raises when provided schema_id is invalid",
+                                              "content": {
+                                                  "application/json": {
+                                                      "example": {
+                                                          "detail": "Query param is invalid. Allowed schema_id format "
+                                                                    ": root/subject/name. Example: "
+                                                                    "users/mobile/ios.json "
+                                                      }
+                                                  }
+                                              }
+                                          },
+                                          HTTPStatus.UNPROCESSABLE_ENTITY.real: {
+                                              "description": "Raises when required parameters are missing",
+                                              "content": {
+                                                  "application/json": {
+                                                      "example": {"detail": [{
+                                                          "loc": ["query", "schema_id"],
+                                                          "msg": "field required",
+                                                          "type": "value_error.missing"
+                                                      }]
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      } | COMMON_ENDPOINT_DOCS

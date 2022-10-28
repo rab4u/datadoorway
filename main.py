@@ -6,6 +6,7 @@ from API.metadata.doc_strings import DocStrings
 from API.metadata.tags import Tags
 from API.routers.admin import Admin
 from API.routers.publish import Publish
+from API.routers.schema import Schema
 from core.settings.settings import Settings
 from core.utilities.basics import get_env_file
 
@@ -29,7 +30,7 @@ env_file = get_env_file()
 settings = Settings(env_file=env_file)
 
 # Publisher router initialization
-dependencies = RouterDependencies(settings=settings).get_publish_router_dependencies()
+dependencies = RouterDependencies(settings=settings).get_auth_dependencies()
 publish = Publish(settings=settings, dependencies=dependencies)
 app.include_router(router=publish.router)
 
@@ -37,6 +38,11 @@ app.include_router(router=publish.router)
 dependencies = RouterDependencies(settings=settings).get_admin_router_dependencies()
 admin = Admin(settings=settings, dependencies=dependencies)
 app.include_router(router=admin.router)
+
+# Schema router initialization
+dependencies = RouterDependencies(settings=settings).get_schema_router_dependencies()
+schema = Schema(settings=settings, dependencies=dependencies)
+app.include_router(router=schema.router)
 
 
 @app.get("/", responses=DocStrings.ROOT_ENDPOINT_DOCS,

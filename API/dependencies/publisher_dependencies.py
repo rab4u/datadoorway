@@ -11,7 +11,7 @@ class PublisherDependencies:
 
     def __init__(self, settings: Settings):
         """
-        Constructor for MiddlewareBuilder
+        Constructor for PublisherDependencies
         :param settings: environment settings
         """
         self.settings = settings

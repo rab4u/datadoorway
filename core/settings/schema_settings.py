@@ -3,7 +3,9 @@ from pydantic import (BaseSettings)
 
 class SchemaSettings(BaseSettings):
     schema_enable_validations: bool = False
-    schema_registry_url: str = None
-    # Schema id format : namespace.name.version
+    # Schema id format : root\subject\name
     schema_id_format: str = r"(\w+)\/(\w+)\/(\w+)$"
     schema_internal_path: str = None
+
+    # TODO: Add schema registry support and apicurio registry support
+    

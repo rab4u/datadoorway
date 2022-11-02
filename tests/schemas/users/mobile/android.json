@@ -1,0 +1,34 @@
+{
+    "properties": {
+        "age": {
+            "exclusiveMaximum": 100,
+            "minimum": 0,
+            "type": "number"
+        },
+        "created_on": {
+            "format": "date-time",
+            "type": "string"
+        },
+        "email": {
+            "format": "email",
+            "type": "string"
+        },
+        "mobile_number": {
+            "minLength": 9,
+            "pattern": "^[0-9]*$",
+            "type": "string"
+        },
+        "name": {
+            "maxLength": 50,
+            "minLength": 2,
+            "type": "string"
+        }
+    },
+    "required": [
+        "age",
+        "name",
+        "email",
+        "mobile_number"
+    ],
+    "type": "object"
+}

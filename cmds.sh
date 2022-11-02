@@ -15,3 +15,14 @@ source .venv/bin/activate or source $(poetry env info --path)/bin/activate
 
 # add package using poetry
 poetry add fastapi
+
+# run DataDoorway
+export ENV_FILE=prod.env
+uvicorn main:app --reload --reload-include $ENV_FILE
+
+# run pytest
+pytest
+
+# run coverage
+coverage run -m pytest
+coverage report

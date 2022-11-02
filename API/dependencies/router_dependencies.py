@@ -29,20 +29,6 @@ class RouterDependencies:
 
         return dependencies if len(dependencies) != 0 else None
 
-    def get_schema_router_dependencies(self) -> Optional[list]:
-        """
-        Prepare list of dependencies required for publisher endpoints
-        :return: Optional[List]
-        """
-        auth_dependencies = self.get_auth_dependencies()
-        dependencies: list = auth_dependencies if auth_dependencies else []
-
-        if self.settings.schema_enable_validations:
-            schema_validations = SchemaValidations(settings=self.settings)
-            dependencies.append(Depends(schema_validations))
-
-        return dependencies if len(dependencies) != 0 else None
-
     def get_admin_router_dependencies(self) -> Optional[List]:
         """
         Prepare list of dependencies required for admin endpoints

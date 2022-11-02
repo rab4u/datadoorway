@@ -16,7 +16,7 @@ class DocStrings:
             "description": "Raises when unauthenticated",
             "content": {
                 "application/json": {
-                    "example": {"Detail": "Not Authenticated "}
+                    "example": {"Detail": "Not Authenticated"}
                 }
             }
         }
@@ -190,6 +190,19 @@ class DocStrings:
                                                      }
                                                  }
                                              }
+                                         },
+                                         HTTPStatus.UNPROCESSABLE_ENTITY.real: {
+                                             "description": "Raises when required parameters are missing",
+                                             "content": {
+                                                 "application/json": {
+                                                     "example": {"detail": [{
+                                                         "loc": ["query", "schema_id"],
+                                                         "msg": "field required",
+                                                         "type": "value_error.missing"
+                                                     }]
+                                                     }
+                                                 }
+                                             }
                                          }
                                      } | COMMON_ENDPOINT_DOCS
 
@@ -231,3 +244,46 @@ class DocStrings:
                                               }
                                           }
                                       } | COMMON_ENDPOINT_DOCS
+
+    SCHEMA_VALIDATE_ENDPOINT_DOCS: dict = {
+                                      HTTPStatus.OK.real: {
+                                          "description": "Returns the success message",
+                                          "content": {
+                                              "application/json": {
+                                                  "example": {
+                                                      "detail": "Schema validation is successful"
+                                                  }
+                                              }
+                                          }
+                                      },
+                                      HTTPStatus.BAD_REQUEST.real: {
+                                          "description": "Raises when schema or data is invalid",
+                                          "content": {
+                                              "application/json": {
+                                                  "example": {
+                                                      "detail": "Data Validation failed. reason: 100 is "
+                                                                "greater than or equal to the maximum of 100 "
+                                                  }
+                                              }
+                                          }
+                                      },
+                                      HTTPStatus.UNPROCESSABLE_ENTITY.real: {
+                                          "description": "Raises when required body params are missing",
+                                          "content": {
+                                              "application/json": {
+                                                  "example": {
+                                                      "detail": [
+                                                          {
+                                                              "loc": [
+                                                                  "body",
+                                                                  "json_schema"
+                                                              ],
+                                                              "msg": "field required",
+                                                              "type": "value_error.missing"
+                                                          }
+                                                      ]
+                                                  }
+                                              }
+                                          }
+                                      }
+                                  } | COMMON_ENDPOINT_DOCS

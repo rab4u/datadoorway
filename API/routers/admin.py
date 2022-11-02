@@ -53,5 +53,5 @@ class Admin:
         """
         admin_validations = AdminValidations(settings=self.settings)
         await admin_validations.validate_setting(key=setting.key)
-        self.settings.update_setting(key=setting.key, value=setting.value)
-        return {"updated_settings": self.settings}
+        await self.settings.update_setting(key=setting.key, value=setting.value)
+        return {"updated_settings": {setting.key: await self.settings.get_setting(setting.key)}}

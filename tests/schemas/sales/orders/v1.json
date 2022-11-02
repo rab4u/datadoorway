@@ -1,0 +1,24 @@
+{
+    "properties": {
+        "order_id": {
+            "format": "uuid",
+            "type": "number"
+        },
+        "price": {
+            "exclusiveMaximum": 100000,
+            "minimum": 0,
+            "type": "number"
+        },
+        "quantity": {
+            "exclusiveMaximum": 10000,
+            "minimum": 1,
+            "type": "number"
+        }
+    },
+    "required": [
+        "order_id",
+        "price",
+        "quantity"
+    ],
+    "type": "object"
+}

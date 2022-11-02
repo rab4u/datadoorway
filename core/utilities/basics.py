@@ -14,16 +14,16 @@ def file_exists(file_path: str) -> str:
     return file_path
 
 
-def get_env_file() -> str:
+def get_env_file(key: str = "ENV_FILE") -> str:
     """
     get the environment file path from ENV
     :return: file_path: if file exists
     """
     try:
-        env_file = os.environ['ENV_FILE']
+        env_file = os.environ[key]
     except KeyError as e:
-        raise Exception("Environmental variable `ENV_FILE` is missing. "
-                        "Please run the command : export ENV_FILE=test.env")
+        raise Exception(f"Environmental variable `{key}` is missing. "
+                        f"Please run the command : export {key}=test.env")
     return file_exists(file_path=env_file)
 
 

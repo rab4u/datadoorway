@@ -40,9 +40,10 @@ admin = Admin(settings=settings, dependencies=dependencies)
 app.include_router(router=admin.router)
 
 # Schema router initialization
-dependencies = RouterDependencies(settings=settings).get_schema_router_dependencies()
-schema = Schema(settings=settings, dependencies=dependencies)
-app.include_router(router=schema.router)
+if settings.schema_enable_validations:
+    dependencies = RouterDependencies(settings=settings).get_auth_dependencies()
+    schema = Schema(settings=settings, dependencies=dependencies)
+    app.include_router(router=schema.router)
 
 
 @app.get("/", responses=DocStrings.ROOT_ENDPOINT_DOCS,

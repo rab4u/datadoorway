@@ -26,3 +26,9 @@ pytest
 # run coverage
 coverage run -m pytest
 coverage report
+
+# coverage badge
+pip3 install readme-coverage-badger
+coverage run -m pytest
+coverage report
+coverage-badge -f -o coverage.svg

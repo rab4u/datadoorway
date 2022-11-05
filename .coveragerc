@@ -1,10 +1,14 @@
 [run]
 omit =
     # ignore from coverage
+    .venv
     tests/*
     */__init__.py
     main.py
 
 
 [html]
-directory = coverage/html_report/
+directory = coverage/html/
+
+[xml]
+output = coverage/xml/coverage.xml

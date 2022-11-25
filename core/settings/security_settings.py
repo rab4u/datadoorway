@@ -1,6 +1,8 @@
 from pydantic import (BaseSettings)
 from pydantic.types import SecretStr
 
+from core.models.jwt_model import JWTModel
+
 
 class SecuritySettings(BaseSettings):
     security_enable_authorization: bool = True
@@ -15,3 +17,13 @@ class SecuritySettings(BaseSettings):
         "PUT": ["dd:write", "dd:admin"],
         "DELETE": ["dd:admin"]
     }
+    _jwt_model_obj: JWTModel = None
+
+    class Config:
+        underscore_attrs_are_private = True
+
+    def set_jwt_model_obj(self, jwt_model_obj: JWTModel):
+        self._jwt_model_obj = jwt_model_obj
+
+    def get_jwt_model_obj(self) -> JWTModel:
+        return self._jwt_model_obj

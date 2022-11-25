@@ -3,8 +3,10 @@ from http import HTTPStatus
 from typing import Mapping
 
 from fastapi import HTTPException
+from pydantic import ValidationError
 
 from core.settings.security_settings import SecuritySettings
+from core.models.jwt_model import JWTModel
 
 
 class JWTBearerValidations:
@@ -23,12 +25,7 @@ class JWTBearerValidations:
         self.jwt_scope_format: str = r"^((?:[a-z]+:[a-z]+)\s?)+$"
 
     async def validate_jwt_scopes(self):
-        try:
-            scopes_string: str = self.token["scopes"]
-        except KeyError as e:
-            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                                detail=f"Exception raised while decoding JWT token. Details: Missing JWT scopes")
-
+        scopes_string: str = self.token["scopes"]
         if not re.match(self.jwt_scope_format, scopes_string):
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED,
@@ -52,13 +49,9 @@ class JWTBearerValidations:
 
     async def validate_jwt_token(self):
         try:
-            self.token["exp"]
-        except KeyError:
+            self.settings.set_jwt_model_obj(JWTModel.parse_obj(self.token))
+        except ValidationError as ve:
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                                detail=f"Exception raised while decoding JWT token. Details: Missing 'exp' in token")
+                                detail=f"Exception raised while decoding JWT token. Details: {ve.errors()}")
 
-        try:
-            self.token["sub"]
-        except KeyError:
-            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                                detail=f"Exception raised while decoding JWT token. Details: Missing 'sub' in token")
+

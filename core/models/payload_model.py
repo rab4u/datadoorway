@@ -1,6 +1,8 @@
 from pydantic.main import BaseModel
 
+from core.models.payload_metadata_model import PayloadMetadataModel
+
 
 class PayloadModel(BaseModel):
-    service_name: str
+    event_metadata: PayloadMetadataModel
     data: dict

@@ -1,8 +1,8 @@
 from http import HTTPStatus
 from typing import Optional, List
 
-from fastapi import APIRouter, Request, Body
-from pydantic.types import Json
+from fastapi import APIRouter, Request, Body, Query
+from pydantic import Required
 
 from API.dependencies.publisher_dependencies import PublisherDependencies
 from API.metadata.doc_strings import DocStrings
@@ -10,6 +10,8 @@ from API.metadata.paths import Paths
 from API.metadata.tags import Tags
 from core.settings.settings import Settings
 from core.utilities.basics import tuple_list_to_dict
+from core.models.payload_metadata_model import PayloadMetadataModel
+from core.models.payload_model import PayloadModel
 
 
 class Publish:
@@ -49,9 +51,24 @@ class Publish:
     async def get_publishers(self) -> dict:
         return {"publishers": self.settings.publisher_publishers}
 
-    async def post_publishers(self, request: Request, payload: dict = Body(example={"event": "hello"})) -> dict:
+    async def post_publishers(self,
+                              request: Request,
+                              payload: dict = Body(example={"event": "hello"}),
+                              event_category: str = Query(
+                                  default=Required,
+                                  description="event_category is like a topic, table or bucket or directory name."
+                                              "Used when writing data to the destination",
+                                  regex=r"^[a-zA-Z][a-zA-Z0-9_]*$"
+                              )
+                              ) -> dict:
         """
         post the data to the publishers like kafka, s3, gcs,...
         """
-        return {"all_publishers": self.settings.publisher_publishers, "requested_publisher": tuple_list_to_dict(
-            request.query_params.multi_items()), "payload": payload}
+        payload_metadata = PayloadMetadataModel(
+            publishers=request.query_params.getlist("publishers"),
+            schema_id=request.query_params.get("schema_id"),
+            backup_publisher=request.query_params.get("backup_publisher"),
+            auth_principal=self.settings.get_jwt_model_obj().sub,
+            event_category=event_category
+        )
+        return {"payload": payload, "metadata": payload_metadata}

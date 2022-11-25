@@ -58,8 +58,9 @@ class TestJWTBearerAuthorization:
             }
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': 'Exception raised while decoding '
-                                             'JWT token. Details: Missing JWT scopes'}
+        assert response.json() == {'detail': "Exception raised while decoding JWT token. "
+                                             "Details: [{'loc': ('scopes',), "
+                                             "'msg': 'field required', 'type': 'value_error.missing'}]"}
 
     def test_token_missing_sub(self):
         response: Response = client.get(
@@ -73,8 +74,9 @@ class TestJWTBearerAuthorization:
             }
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': "Exception raised while decoding JWT token. Details: "
-                                             "Missing 'sub' in token"}
+        assert response.json() == {'detail': "Exception raised while decoding JWT token. "
+                                             "Details: [{'loc': ('sub',), "
+                                             "'msg': 'field required', 'type': 'value_error.missing'}]"}
 
     def test_token_missing_exp(self):
         response: Response = client.get(
@@ -88,8 +90,9 @@ class TestJWTBearerAuthorization:
             }
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': "Exception raised while decoding JWT token. Details: "
-                                             "Missing 'exp' in token"}
+        assert response.json() == {'detail': "Exception raised while decoding JWT token. "
+                                             "Details: [{'loc': ('exp',), "
+                                             "'msg': 'field required', 'type': 'value_error.missing'}]"}
 
     def test_token_invalid_scopes_format(self):
         response: Response = client.get(

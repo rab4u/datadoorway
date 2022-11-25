@@ -31,7 +31,8 @@ class TestPublishEndpoint:
             },
             params={
                 "publishers": ["kafka", "s3"],
-                "schema_id": "users/mobile/android"
+                "schema_id": "users/mobile/android",
+                "event_category": "mobile"
             },
             json={
                 "age": 99,

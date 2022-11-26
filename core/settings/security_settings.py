@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import (BaseSettings)
 from pydantic.types import SecretStr
 
@@ -23,7 +25,22 @@ class SecuritySettings(BaseSettings):
         underscore_attrs_are_private = True
 
     def set_jwt_model_obj(self, jwt_model_obj: JWTModel):
+        """
+        This functions sets JWTModel object
+        :param jwt_model_obj: JWTModel object
+        """
         self._jwt_model_obj = jwt_model_obj
 
     def get_jwt_model_obj(self) -> JWTModel:
+        """
+        This functions returns JWTModel object
+        :return: JWTModel object
+        """
         return self._jwt_model_obj
+
+    def get_sub(self) -> Optional[str]:
+        """
+        This function gets the JWT SUB
+        :return: jwt sub or None if auth is disabled
+        """
+        return self.get_jwt_model_obj().sub if self.get_jwt_model_obj() else None

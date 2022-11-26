@@ -54,3 +54,10 @@ class Settings(
         :return:
         """
         return getattr(self, key.lower())
+
+    def get_settings(self, prefix: str = "", remove_prefix: bool = True) -> dict:
+        settings = self.dict()
+        return {key.replace(prefix, ""): settings[key] for key in settings if remove_prefix and key.startswith(prefix)}
+
+
+

@@ -68,7 +68,7 @@ class Publish:
             publishers=request.query_params.getlist("publishers"),
             schema_id=request.query_params.get("schema_id"),
             backup_publisher=request.query_params.get("backup_publisher"),
-            auth_principal=self.settings.get_jwt_model_obj().sub,
+            auth_principal=self.settings.get_sub(),
             event_category=event_category
         )
         return {"payload": payload, "metadata": payload_metadata}

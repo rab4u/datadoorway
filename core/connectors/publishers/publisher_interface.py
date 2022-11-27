@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from core.models.payload_model import PayloadModel
+
 
 class PublisherInterface:
     @abstractmethod
@@ -11,5 +13,5 @@ class PublisherInterface:
         pass
 
     @abstractmethod
-    async def send(self):
+    async def send(self, destination: str, payload: PayloadModel):
         pass

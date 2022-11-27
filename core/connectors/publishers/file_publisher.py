@@ -1,9 +1,5 @@
-import asyncio
-
-from aiokafka import AIOKafkaProducer
-from kafka.errors import KafkaConnectionError
-
 from core.connectors.publishers.publisher_interface import PublisherInterface
+from core.models.payload_model import PayloadModel
 
 
 class FilePublisher(PublisherInterface):
@@ -17,8 +13,9 @@ class FilePublisher(PublisherInterface):
     async def stop(self):
         pass
 
-    async def send(self):
+    async def send(self, destination: str, payload: PayloadModel):
         pass
+
 
 
 

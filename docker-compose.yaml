@@ -21,3 +21,15 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+#  kafka-manager:
+#    image: sheepkiller/kafka-manager:latest
+#    ports:
+#      - "9000:9000"
+#    links:
+#      - zookeeper
+#      - kafka
+#    environment:
+#      ZK_HOSTS: zookeeper:2181
+#      APPLICATION_SECRET: letmein
+#      KM_ARGS: -Djava.net.preferIPv4Stack=true

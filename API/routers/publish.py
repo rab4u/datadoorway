@@ -7,22 +7,25 @@ from pydantic import Required
 from API.dependencies.publisher_dependencies import PublisherDependencies
 from API.metadata.doc_strings import DocStrings
 from API.metadata.paths import Paths
+from API.metadata.publishers import Publishers
 from API.metadata.tags import Tags
-from core.settings.settings import Settings
-from core.utilities.basics import tuple_list_to_dict
+from core.connectors.publishers.publisher_interface import PublisherInterface
 from core.models.payload_metadata_model import PayloadMetadataModel
 from core.models.payload_model import PayloadModel
+from core.settings.settings import Settings
 
 
 class Publish:
 
-    def __init__(self, settings: Settings, dependencies: Optional[List]):
+    def __init__(self, settings: Settings, dependencies: Optional[List], publishers: dict[str, PublisherInterface]):
         """
         Constructor for publish endpoint
         :param settings: environment settings
-        :param dependencies:
+        :param dependencies: list dependencies for the path
+        :param publisher_objs: list of publisher objects
         """
         self.settings = settings
+        self.publishers = publishers
 
         self.router = APIRouter(tags=[str(Tags.PUBLISH.value)], dependencies=dependencies) \
             if dependencies else APIRouter(tags=[str(Tags.PUBLISH.value)])
@@ -71,4 +74,17 @@ class Publish:
             auth_principal=self.settings.get_sub(),
             event_category=event_category
         )
-        return {"payload": payload, "metadata": payload_metadata}
+
+        enriched_payload = PayloadModel(
+            payload_metadata=payload_metadata,
+            payload=payload
+        )
+
+        res = {}
+
+        for publisher in payload_metadata.publishers:
+            res = await self.publishers[publisher].send(
+                destination=payload_metadata.event_category,
+                payload=enriched_payload)
+
+        return res

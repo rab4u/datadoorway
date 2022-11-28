@@ -1,19 +1,19 @@
 import json
+import operator
+import re
+from functools import partial
 from http import HTTPStatus
 from pathlib import Path
-import re
 
+import fastjsonschema
+from cachetools import TTLCache, cachedmethod
 from fastapi import HTTPException, Query
 from fastapi import Request
-from jsonschema.validators import Draft202012Validator
 from pydantic import Required
 
+from API.metadata.paths import Paths
 from core.settings.settings import SchemaSettings
 from core.utilities.basics import file_exists
-from API.metadata.paths import Paths
-
-import jsonschema
-from jsonschema import FormatChecker, Validator
 
 
 class SchemaValidations:
@@ -23,6 +23,13 @@ class SchemaValidations:
         :param settings: Setting Object
         """
         self.settings = settings
+        self.cache = TTLCache(maxsize=self.settings.schema_cache_size, ttl=self.settings.schema_cache_ttl)
+
+    def get_cache_size(self):
+        return self.settings.schema_cache_size
+
+    def get_cache_ttl(self):
+        return self.settings.schema_cache_ttl
 
     async def get_schema_file(self, schema_id) -> str:
         """
@@ -34,6 +41,19 @@ class SchemaValidations:
         file_path = f"{self.settings.schema_internal_path.strip('/')}/{schema_id}.json"
         schema_file = file_exists(file_path=file_path)
         return Path(schema_file).absolute().as_uri()
+
+    @cachedmethod(operator.attrgetter('cache'))
+    def create_json_validator(self, schema_id) -> partial:
+        """
+        This creates a json validator using fastjsonschema library
+        :param schema_id: schema_id of the json schema
+        :return: a json validator of partial type
+        """
+        file_path = f"{self.settings.schema_internal_path.strip('/')}/{schema_id}.json"
+        with open(file=file_path, mode="r") as schema_file:
+            schema_json = json.loads(schema_file.read())
+            validator = fastjsonschema.compile(schema_json)
+        return validator
 
     async def __call__(self, request: Request,
                        schema_id: str = Query(
@@ -53,34 +73,28 @@ class SchemaValidations:
                 if request.method == "GET" and request.url.path == Paths.SCHEMA.value:
                     await self.get_schema_file(schema_id=schema_id)
                 elif request.method == "POST" and request.url.path == Paths.PUBLISH.value:
-                    schema_uri: str = await self.get_schema_file(schema_id=schema_id)
-                    jsonschema.validate(
-                        instance=await request.json(),
-                        schema={"$ref": schema_uri},
-                        format_checker=FormatChecker()
-                    )
+                    validate = self.create_json_validator(schema_id=schema_id)
+                    validate(await request.json())
                 elif request.method == "POST" and request.url.path == Paths.SCHEMA.value:
                     schema = await request.json()
                     if schema:
-                        Draft202012Validator.check_schema(schema=await request.json())
+                        fastjsonschema.compile(definition=schema)
                     else:
                         raise HTTPException(
                             status_code=HTTPStatus.BAD_REQUEST,
                             detail="Schema Validation failed. reason: Empty schema"
                         )
-
         except FileNotFoundError:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
                 detail=f"Invalid schema id. reason: No schema found with the schema id : {schema_id}"
             )
-        except jsonschema.exceptions.ValidationError as e:
+        except (
+                fastjsonschema.JsonSchemaException,
+                fastjsonschema.JsonSchemaValueException,
+                fastjsonschema.JsonSchemaDefinitionException
+                ) as e:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
-                detail=f"Data Validation failed. reason: {e.message}"
-            )
-        except jsonschema.exceptions.SchemaError as e:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail=f"Schema Validation failed. reason: {e.message}"
+                detail=f"Validation failed. reason: {e}"
             )

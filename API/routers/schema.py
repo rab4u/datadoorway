@@ -1,20 +1,18 @@
 import json
 import os
 from http import HTTPStatus
-from typing import Optional, List
 from pathlib import Path
+from typing import Optional, List
 
-import jsonschema
+import fastjsonschema
 from fastapi import APIRouter, Request, Body, HTTPException
-from jsonschema import FormatChecker
 
 from API.dependencies.schema_dependencies import SchemaDependencies
+from API.metadata.doc_strings import DocStrings
 from API.metadata.paths import Paths
 from API.metadata.tags import Tags
-from API.metadata.doc_strings import DocStrings
-
-from core.settings.settings import Settings
 from core.models.schema_test_model import SchemaTestModel
+from core.settings.settings import Settings
 
 
 class Schema:
@@ -95,20 +93,18 @@ class Schema:
         """
 
         try:
-            jsonschema.validate(
-                instance=schema_test.data,
-                schema=schema_test.json_schema,
-                format_checker=FormatChecker()
+            fastjsonschema.validate(
+                definition=schema_test.json_schema,
+                data=schema_test.data
             )
-        except jsonschema.exceptions.ValidationError as e:
+        except (
+                fastjsonschema.JsonSchemaException,
+                fastjsonschema.JsonSchemaValueException,
+                fastjsonschema.JsonSchemaDefinitionException
+        ) as e:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
-                detail=f"Data Validation failed. reason: {e.message}"
-            )
-        except jsonschema.exceptions.SchemaError as e:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail=f"Schema Validation failed. reason: {e.message}"
+                detail=f"Validation failed. reason: {e}"
             )
 
         return {"detail": f"Schema validation is successful"}

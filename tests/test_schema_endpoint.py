@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import pytest
 from fastapi.testclient import TestClient
 from requests import Response
 
@@ -219,7 +220,7 @@ class TestSchemaEndpoint:
         assert response.json() == {'detail': "Schema Validation failed. "
                                              "reason: 'number1' is not valid under any of the given schemas"}
 
-    def test_validate_invalid_data(self):
+    def test_validate_invalid_data(self, client):
         response: Response = client.post(
             url="/validate",
             headers={

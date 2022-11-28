@@ -3,9 +3,10 @@ from pydantic import (BaseSettings)
 
 class SchemaSettings(BaseSettings):
     schema_enable_validations: bool = False
-    # Schema id format : root\subject\name
     schema_id_format: str = r"(\w+)\/(\w+)\/(\w+)$"
     schema_internal_path: str = None
+    schema_cache_size: int = 100*1024
+    schema_cache_ttl: int = 1800
 
     # TODO: Add schema registry support and apicurio registry support
     

@@ -3,9 +3,14 @@ from http import HTTPStatus
 from fastapi.testclient import TestClient
 from requests import Response
 
-from main import app, settings
+from core.settings.settings import Settings
+from core.utilities.basics import get_env_file
+from main import app
+
 
 client = TestClient(app)
+env_file = get_env_file()
+settings = Settings(env_file=env_file)
 
 
 class TestJWTBearerAuthorization:

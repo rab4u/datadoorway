@@ -7,11 +7,15 @@ from requests import Response
 from main import app
 from tests.constants import JWT_TOKEN
 
-client = TestClient(app)
-
 
 class TestSchemaEndpoint:
-    def test_get_schema_success(self):
+
+    @pytest.fixture
+    def client(self):
+        with TestClient(app) as c:
+            yield c
+
+    def test_get_schema_success(self, client):
         response: Response = client.get(
             url="/schema",
             headers={
@@ -25,7 +29,7 @@ class TestSchemaEndpoint:
         )
         assert response.status_code == HTTPStatus.OK
 
-    def test_get_schema_invalid_format(self):
+    def test_get_schema_invalid_format(self, client):
         response: Response = client.get(
             url="/schema",
             headers={
@@ -41,7 +45,7 @@ class TestSchemaEndpoint:
         assert response.json() == {'detail': 'Query param is invalid. Allowed schema_id format : '
                                              'root/subject/name. Example: users/mobile/ios.json'}
 
-    def test_get_schema_io_error(self):
+    def test_get_schema_io_error(self, client):
         response: Response = client.get(
             url="/schema",
             headers={
@@ -56,7 +60,7 @@ class TestSchemaEndpoint:
         assert response.json() == {'detail': "Invalid schema id. reason: "
                                              "No schema found with the schema id : users/mobile/android1"}
 
-    def test_post_schema_empty(self):
+    def test_post_schema_empty(self, client):
         response: Response = client.post(
             url="/schema",
             headers={
@@ -71,7 +75,7 @@ class TestSchemaEndpoint:
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.json() == {'detail': 'Schema Validation failed. reason: Empty schema'}
 
-    def test_post_schema_invalid(self):
+    def test_post_schema_invalid(self, client):
         response: Response = client.post(
             url="/schema",
             headers={
@@ -97,10 +101,9 @@ class TestSchemaEndpoint:
             }
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json() == {'detail': "Schema Validation failed. "
-                                             "reason: 'string1' is not valid under any of the given schemas"}
+        assert response.json() == {'detail': "Validation failed. reason: Unknown type: 'string1'"}
 
-    def test_post_schema_success(self):
+    def test_post_schema_success(self, client):
         response: Response = client.post(
             url="/schema",
             headers={
@@ -128,7 +131,7 @@ class TestSchemaEndpoint:
         assert response.status_code == HTTPStatus.OK
         assert response.json() == {'detail': 'Successfully updated the schema with schema id: users/tmp/v1'}
 
-    def test_post_schema_io_error(self):
+    def test_post_schema_io_error(self, client):
         response: Response = client.post(
             url="/schema",
             headers={
@@ -157,7 +160,7 @@ class TestSchemaEndpoint:
         assert response.json() == {'detail': 'Cannot create / overwrite existing '
                                              'schema with schema_id : users/mobile/v2'}
 
-    def test_validate_success(self):
+    def test_validate_success(self, client):
         response: Response = client.post(
             url="/validate",
             headers={
@@ -188,7 +191,7 @@ class TestSchemaEndpoint:
         assert response.status_code == HTTPStatus.OK
         assert response.json() == {'detail': 'Schema validation is successful'}
 
-    def test_validate_invalid_schema(self):
+    def test_validate_invalid_schema(self, client):
         response: Response = client.post(
             url="/validate",
             headers={
@@ -217,8 +220,7 @@ class TestSchemaEndpoint:
             }
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json() == {'detail': "Schema Validation failed. "
-                                             "reason: 'number1' is not valid under any of the given schemas"}
+        assert response.json() == {'detail': "Validation failed. reason: Unknown type: 'number1'"}
 
     def test_validate_invalid_data(self, client):
         response: Response = client.post(
@@ -249,5 +251,4 @@ class TestSchemaEndpoint:
             }
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json() == {'detail': 'Data Validation failed. reason: 110 is greater than or equal to the '
-                                             'maximum of 100'}
+        assert response.json() == {'detail': 'Validation failed. reason: data.age must be smaller than 100'}

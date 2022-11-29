@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import pytest
 from fastapi.testclient import TestClient
 from requests import Response
 
@@ -8,14 +9,14 @@ from core.utilities.basics import get_env_file
 from main import app
 
 
-client = TestClient(app)
-env_file = get_env_file()
-settings = Settings(env_file=env_file)
-
-
 class TestJWTBearerAuthorization:
 
-    def test_no_authorization_header(self):
+    @pytest.fixture
+    def client(self):
+        with TestClient(app) as c:
+            yield c
+
+    def test_no_authorization_header(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -25,7 +26,7 @@ class TestJWTBearerAuthorization:
         assert response.status_code == HTTPStatus.FORBIDDEN
         assert response.json() == {'detail': 'Not authenticated'}
 
-    def test_invalid_token(self):
+    def test_invalid_token(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -36,7 +37,7 @@ class TestJWTBearerAuthorization:
         assert response.status_code == HTTPStatus.FORBIDDEN
         assert response.json() == {'detail': 'Invalid authentication credentials'}
 
-    def test_token_expired(self):
+    def test_token_expired(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -52,7 +53,7 @@ class TestJWTBearerAuthorization:
         assert response.json() == {'detail': 'Exception raised while decoding JWT token. Details: '
                                              'Signature has expired'}
 
-    def test_token_missing_scopes(self):
+    def test_token_missing_scopes(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -67,7 +68,7 @@ class TestJWTBearerAuthorization:
                                              "Details: [{'loc': ('scopes',), "
                                              "'msg': 'field required', 'type': 'value_error.missing'}]"}
 
-    def test_token_missing_sub(self):
+    def test_token_missing_sub(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -83,7 +84,7 @@ class TestJWTBearerAuthorization:
                                              "Details: [{'loc': ('sub',), "
                                              "'msg': 'field required', 'type': 'value_error.missing'}]"}
 
-    def test_token_missing_exp(self):
+    def test_token_missing_exp(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -99,7 +100,7 @@ class TestJWTBearerAuthorization:
                                              "Details: [{'loc': ('exp',), "
                                              "'msg': 'field required', 'type': 'value_error.missing'}]"}
 
-    def test_token_invalid_scopes_format(self):
+    def test_token_invalid_scopes_format(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -115,7 +116,7 @@ class TestJWTBearerAuthorization:
                                              "JWT scopes format:'<endpoint>:<role> <endpoint>:<role> "
                                              "<endpoint>:<role> ...'. Example: 'user:read user:write'"}
 
-    def test_insufficient_permissions(self):
+    def test_insufficient_permissions(self, client):
         response: Response = client.get(
             url="/publish",
             headers={
@@ -129,7 +130,7 @@ class TestJWTBearerAuthorization:
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         assert response.json() == {'detail': 'Exception raised while decoding JWT token. Insufficient permissions'}
 
-    def test_auth_success(self):
+    def test_auth_success(self, client):
         response: Response = client.get(
             url="/publish",
             headers={

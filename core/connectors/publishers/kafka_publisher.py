@@ -11,8 +11,7 @@ from core.models.payload_model import PayloadModel
 class KafkaPublisher(PublisherInterface):
 
     def __init__(self, params: dict):
-        loop = asyncio.get_event_loop()
-        self.producer = AIOKafkaProducer(loop=loop, **params)
+        self.producer = AIOKafkaProducer(**params)
 
     async def start(self):
         try:

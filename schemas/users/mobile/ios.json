@@ -2,7 +2,7 @@
   "type" : "object",
   "properties" : {
     "name" : {"type" : "string", "minLength": 2, "maxLength": 50},
-    "age" : {"type" : "number", "minimum" :  10, "exclusiveMaximum":  100},
+    "age" : {"type" : "number", "minimum" :  1, "exclusiveMaximum":  100},
     "email": {"type":  "string", "format":  "email"},
     "created_on": {"type": "string", "format":  "date-time"},
     "mobile_number": {"type":  "string", "minLength": 9, "pattern":  "^[0-9]*$"}

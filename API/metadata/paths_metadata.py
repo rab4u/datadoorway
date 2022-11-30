@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Paths(Enum):
+class PathsMetadata(Enum):
     ROOT = "/"
     PUBLISH = "/publish"
     SCHEMA = "/schema"

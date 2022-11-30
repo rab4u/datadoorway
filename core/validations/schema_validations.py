@@ -4,32 +4,31 @@ import re
 from functools import partial
 from http import HTTPStatus
 from pathlib import Path
+from threading import Lock
 
 import fastjsonschema
-from cachetools import TTLCache, cachedmethod
+from cachetools import TTLCache, cachedmethod, LRUCache
 from fastapi import HTTPException, Query
 from fastapi import Request
 from pydantic import Required
 
-from API.metadata.paths import Paths
+from API.metadata.paths_metadata import PathsMetadata
 from core.settings.settings import SchemaSettings
 from core.utilities.basics import file_exists
 
 
 class SchemaValidations:
+    schema_dict: dict = {}
+    cache: LRUCache
+
     def __init__(self, settings: SchemaSettings):
         """
         Constructor for SchemaValidations
         :param settings: Setting Object
         """
         self.settings = settings
-        self.cache = TTLCache(maxsize=self.settings.schema_cache_size, ttl=self.settings.schema_cache_ttl)
-
-    def get_cache_size(self):
-        return self.settings.schema_cache_size
-
-    def get_cache_ttl(self):
-        return self.settings.schema_cache_ttl
+        # self.cache = TTLCache(maxsize=self.settings.schema_cache_size, ttl=self.settings.schema_cache_ttl)
+        SchemaValidations.cache = LRUCache(maxsize=self.settings.schema_cache_size)
 
     async def get_schema_file(self, schema_id) -> str:
         """
@@ -43,17 +42,21 @@ class SchemaValidations:
         return Path(schema_file).absolute().as_uri()
 
     @cachedmethod(operator.attrgetter('cache'))
-    def create_json_validator(self, schema_id) -> partial:
+    def cache_schema_validator(self, schema_id: str, validator: partial = None) -> partial:
         """
         This creates a json validator using fastjsonschema library
+        :param validator: a compiled json validator object
         :param schema_id: schema_id of the json schema
         :return: a json validator of partial type
         """
-        file_path = f"{self.settings.schema_internal_path.strip('/')}/{schema_id}.json"
-        with open(file=file_path, mode="r") as schema_file:
-            schema_json = json.loads(schema_file.read())
-            validator = fastjsonschema.compile(schema_json)
-        return validator
+        if schema_id not in self.schema_dict and not validator:
+            file_path = f"{self.settings.schema_internal_path.strip('/')}/{schema_id}.json"
+            with open(file=file_path, mode="r") as schema_file:
+                SchemaValidations.schema_dict[schema_id] = fastjsonschema.compile(
+                    definition=json.loads(schema_file.read()))
+        elif validator:
+            SchemaValidations.schema_dict[schema_id] = validator
+        return SchemaValidations.schema_dict[schema_id]
 
     async def __call__(self, request: Request,
                        schema_id: str = Query(
@@ -70,15 +73,17 @@ class SchemaValidations:
 
         try:
             if self.settings.schema_internal_path:
-                if request.method == "GET" and request.url.path == Paths.SCHEMA.value:
+                if request.method == "GET" and request.url.path == PathsMetadata.SCHEMA.value:
                     await self.get_schema_file(schema_id=schema_id)
-                elif request.method == "POST" and request.url.path == Paths.PUBLISH.value:
-                    validate = self.create_json_validator(schema_id=schema_id)
+                elif request.method == "POST" and request.url.path == PathsMetadata.PUBLISH.value:
+                    validate = self.cache_schema_validator(schema_id=schema_id)
                     validate(await request.json())
-                elif request.method == "POST" and request.url.path == Paths.SCHEMA.value:
+                elif request.method == "POST" and request.url.path == PathsMetadata.SCHEMA.value:
                     schema = await request.json()
                     if schema:
-                        fastjsonschema.compile(definition=schema)
+                        self.cache_schema_validator.cache_clear(SchemaValidations)
+                        self.cache_schema_validator(schema_id=schema_id,
+                                                    validator=fastjsonschema.compile(definition=schema))
                     else:
                         raise HTTPException(
                             status_code=HTTPStatus.BAD_REQUEST,

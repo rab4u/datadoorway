@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 
-class DocStrings:
+class ResponseMetadata:
     COMMON_ENDPOINT_DOCS: dict = {
         HTTPStatus.UNAUTHORIZED.real: {
             "description": "Raises when unauthorized",
@@ -45,15 +45,25 @@ class DocStrings:
                                         } | COMMON_ENDPOINT_DOCS
 
     PUBLISHER_POST_ENDPOINT_DOCS: dict = {
-                                             HTTPStatus.OK.real: {
+                                             HTTPStatus.MULTI_STATUS.real: {
                                                  "description": "Sends the data to the publishers like kafka, s3, "
                                                                 "gcs, ...",
                                                  "content": {
                                                      "application/json": {
-                                                         "example": {"publishers": {
-                                                             HTTPStatus.OK.real: ["kafka", "s3", "bigquery"],
-                                                             HTTPStatus.INTERNAL_SERVER_ERROR: ["gcs", "athena"]
-                                                         }}
+                                                         "example": {
+                                                             "success": {
+                                                                 "kafka": {
+                                                                     "status": 200,
+                                                                     "destination": "mobile"
+                                                                 }
+                                                             },
+                                                             "failed": {
+                                                                 "s3": {
+                                                                     "status": 500,
+                                                                     "destination": "mobile"
+                                                                 }
+                                                             }
+                                                         }
                                                      }
                                                  }
                                              },

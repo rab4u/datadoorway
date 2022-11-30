@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from core.connectors.publishers.publisher_interface import PublisherInterface
 from core.models.payload_model import PayloadModel
 
@@ -14,7 +16,9 @@ class ConsolePublisher(PublisherInterface):
         pass
 
     async def send(self, destination: str, payload: PayloadModel):
-        pass
+        print(payload.json())
+        return HTTPStatus.OK, "success"
+
 
 
 

@@ -1,4 +1,4 @@
-class App:
+class AppMetadata:
     title: str = "DataDoorway (DD)"
     description: str = "Simplifies data transfer in data multiverse"
     version: str = "1.0"

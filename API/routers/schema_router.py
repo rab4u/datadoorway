@@ -8,14 +8,14 @@ import fastjsonschema
 from fastapi import APIRouter, Request, Body, HTTPException
 
 from API.dependencies.schema_dependencies import SchemaDependencies
-from API.metadata.doc_strings import DocStrings
-from API.metadata.paths import Paths
-from API.metadata.tags import Tags
+from API.metadata.response_metadata import ResponseMetadata
+from API.metadata.paths_metadata import PathsMetadata
+from API.metadata.tags_metadata import TagsMetadata
 from core.models.schema_test_model import SchemaTestModel
 from core.settings.settings import Settings
 
 
-class Schema:
+class SchemaRouter:
     def __init__(self, settings: Settings, dependencies: Optional[List]):
         """
         Constructor for publish endpoint
@@ -28,32 +28,32 @@ class Schema:
         schema_dependencies = SchemaDependencies(settings=self.settings)
 
         self.router = APIRouter(
-            tags=[str(Tags.VALIDATIONS.value)],
+            tags=[str(TagsMetadata.VALIDATIONS.value)],
             dependencies=dependencies,
-        ) if dependencies else APIRouter(tags=[str(Tags.VALIDATIONS.value)])
+        ) if dependencies else APIRouter(tags=[str(TagsMetadata.VALIDATIONS.value)])
 
         self.router.add_api_route(
-            path=str(Paths.SCHEMA.value),
+            path=str(PathsMetadata.SCHEMA.value),
             endpoint=self.get_schema,
             dependencies=schema_dependencies.endpoint_get_dependencies(),
             methods=["GET"],
-            responses=DocStrings.SCHEMA_GET_ENDPOINT_DOCS
+            responses=ResponseMetadata.SCHEMA_GET_ENDPOINT_DOCS
         )
 
         self.router.add_api_route(
-            path=str(Paths.SCHEMA.value),
+            path=str(PathsMetadata.SCHEMA.value),
             endpoint=self.post_schema,
             dependencies=schema_dependencies.endpoint_post_dependencies(),
             methods=["POST"],
-            responses=DocStrings.SCHEMA_POST_ENDPOINT_DOCS
+            responses=ResponseMetadata.SCHEMA_POST_ENDPOINT_DOCS
         )
 
         self.router.add_api_route(
-            path=str(Paths.SCHEMATEST.value),
+            path=str(PathsMetadata.SCHEMATEST.value),
             endpoint=self.schema_validate,
             dependencies=None,
             methods=["POST"],
-            responses=DocStrings.SCHEMA_VALIDATE_ENDPOINT_DOCS
+            responses=ResponseMetadata.SCHEMA_VALIDATE_ENDPOINT_DOCS
         )
 
     async def get_schema(self, request: Request):

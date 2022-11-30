@@ -2,16 +2,16 @@ from typing import Optional, List
 
 from fastapi import APIRouter
 
-from API.metadata.paths import Paths
-from API.metadata.tags import Tags
-from API.metadata.doc_strings import DocStrings
+from API.metadata.paths_metadata import PathsMetadata
+from API.metadata.tags_metadata import TagsMetadata
+from API.metadata.response_metadata import ResponseMetadata
 
 from core.models.setting_model import SettingModel
 from core.settings.settings import Settings
 from core.validations.admin_validations import AdminValidations
 
 
-class Admin:
+class AdminRouter:
     def __init__(self, settings: Settings, dependencies: Optional[List]):
         """
         Constructor for publish endpoint
@@ -21,24 +21,24 @@ class Admin:
         self.settings = settings
 
         self.router = APIRouter(
-            tags=[str(Tags.ADMIN.value)],
+            tags=[str(TagsMetadata.ADMIN.value)],
             dependencies=dependencies,
-        ) if dependencies else APIRouter(tags=[str(Tags.ADMIN.value)])
+        ) if dependencies else APIRouter(tags=[str(TagsMetadata.ADMIN.value)])
 
         self.router.add_api_route(
-            path=str(Paths.ADMIN.value),
+            path=str(PathsMetadata.ADMIN.value),
             endpoint=self.get_settings,
             dependencies=None,
             methods=["GET"],
-            responses=DocStrings.ADMIN_GET_ENDPOINT_DOCS
+            responses=ResponseMetadata.ADMIN_GET_ENDPOINT_DOCS
         )
 
         self.router.add_api_route(
-            path=str(Paths.ADMIN.value),
+            path=str(PathsMetadata.ADMIN.value),
             endpoint=self.update_setting,
             dependencies=None,
             methods=["PUT"],
-            responses=DocStrings.ADMIN_PUT_ENDPOINT_DOCS
+            responses=ResponseMetadata.ADMIN_PUT_ENDPOINT_DOCS
         )
 
     async def get_settings(self) -> dict:

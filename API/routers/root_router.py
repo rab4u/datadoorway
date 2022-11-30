@@ -5,14 +5,14 @@ from fastapi import APIRouter
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from starlette.responses import HTMLResponse, FileResponse
 
-from API.metadata.app import App
-from API.metadata.doc_strings import DocStrings
-from API.metadata.paths import Paths
-from API.metadata.tags import Tags
+from API.metadata.app_metadata import AppMetadata
+from API.metadata.response_metadata import ResponseMetadata
+from API.metadata.paths_metadata import PathsMetadata
+from API.metadata.tags_metadata import TagsMetadata
 from core.settings.settings import Settings
 
 
-class Root:
+class RootRouter:
     def __init__(self, settings: Settings, dependencies: Optional[list]):
         """
         Constructor for publish endpoint
@@ -21,19 +21,19 @@ class Root:
         """
         self.settings = settings
 
-        self.router = APIRouter(tags=[str(Tags.ROOT.value)], dependencies=dependencies) \
-            if dependencies else APIRouter(tags=[str(Tags.ROOT.value)])
+        self.router = APIRouter(tags=[str(TagsMetadata.ROOT.value)], dependencies=dependencies) \
+            if dependencies else APIRouter(tags=[str(TagsMetadata.ROOT.value)])
 
         self.router.add_api_route(
-            path=str(Paths.ROOT.value),
+            path=str(PathsMetadata.ROOT.value),
             endpoint=self.get_root,
             methods=["GET"],
-            responses=DocStrings.ROOT_ENDPOINT_DOCS,
+            responses=ResponseMetadata.ROOT_ENDPOINT_DOCS,
             response_class=HTMLResponse
         )
 
         self.router.add_api_route(
-            path=str(Paths.FAVICON.value),
+            path=str(PathsMetadata.FAVICON.value),
             endpoint=self.get_favicon,
             methods=["GET"],
             include_in_schema=False
@@ -44,9 +44,9 @@ class Root:
         html_content = f"""
         <html>
         <body>
-        <h1>Welcome to {App.title}</h1>
-        <h2>{App.description}<h2>
-        <h2>License: <a href='{App.license_info['url']}'>{App.license_info['name']}</a><h2>
+        <h1>Welcome to {AppMetadata.title}</h1>
+        <h2>{AppMetadata.description}<h2>
+        <h2>License: <a href='{AppMetadata.license_info['url']}'>{AppMetadata.license_info['name']}</a><h2>
         </body>
         </html>
         """

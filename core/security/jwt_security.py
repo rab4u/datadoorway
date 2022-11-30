@@ -10,19 +10,19 @@ from core.settings.security_settings import SecuritySettings
 from core.validations.jwt_bearer_validations import JWTBearerValidations
 
 
-class JWTBearerAuthorization(HTTPBearer):
+class JWTSecurity(HTTPBearer):
     def __init__(self, settings: SecuritySettings):
         """
         Constructor for JWTAuthorization
         :param settings: security settings to configure JWT Authorization
         """
         self.settings = settings
-        super(JWTBearerAuthorization, self).__init__(
+        super(JWTSecurity, self).__init__(
             auto_error=settings.security_http_bearer_auto_error
         )
 
     async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(JWTBearerAuthorization, self).__call__(request)
+        credentials: HTTPAuthorizationCredentials = await super(JWTSecurity, self).__call__(request)
         decoded_token = await self.decode_jwt(credentials.credentials)
         jwt_validations = JWTBearerValidations(
             settings=self.settings,

@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Tags(Enum):
+class TagsMetadata(Enum):
     PUBLISH = "publish"
     VALIDATIONS = "validations"
     ADMIN = "admin"

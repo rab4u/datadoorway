@@ -8,7 +8,7 @@ from core.connectors.publishers.kafka_publisher import KafkaPublisher
 from core.connectors.publishers.s3_publisher import S3Publisher
 
 
-class Publishers(Enum):
+class PublishersMetadata(Enum):
     KAFKA = KafkaPublisher
     S3 = S3Publisher
     CONSOLE = ConsolePublisher

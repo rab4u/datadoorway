@@ -1,8 +1,8 @@
-import asyncio
+from http import HTTPStatus
 
 from aiokafka import AIOKafkaProducer
 from kafka.errors import KafkaConnectionError, RequestTimedOutError, NotEnoughReplicasError, \
-    NotEnoughReplicasAfterAppendError
+    NotEnoughReplicasAfterAppendError, NodeNotReadyError, NotLeaderForPartitionError
 
 from core.connectors.publishers.publisher_interface import PublisherInterface
 from core.models.payload_model import PayloadModel
@@ -23,14 +23,11 @@ class KafkaPublisher(PublisherInterface):
     async def stop(self):
         await self.producer.stop()
 
-    async def send(self, destination: str, payload: PayloadModel):
+    async def send(self, destination: str, payload: PayloadModel) -> (int, str):
         try:
             await self.producer.send_and_wait(topic=destination, value=payload.json().encode("utf-8"))
-        except (RequestTimedOutError, NotEnoughReplicasError, NotEnoughReplicasAfterAppendError) as e:
-            pass
-
-        return payload
-
-
-
-
+            return HTTPStatus.OK, "success"
+        except (RequestTimedOutError, NotEnoughReplicasError,
+                NotEnoughReplicasAfterAppendError, NodeNotReadyError,
+                NotLeaderForPartitionError) as e:
+            return HTTPStatus.INTERNAL_SERVER_ERROR, str(e)

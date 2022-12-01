@@ -19,6 +19,8 @@ watchfiles = "^0.18.0"
 aiokafka = "^0.8.0"
 cachetools = "^5.2.0"
 fastjsonschema = "^2.16.2"
+awswrangler = {extras = ["modin"], version = "^3.0.0rc2"}
+#ray = "^2.0.1"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^6.5.0"
@@ -28,4 +30,3 @@ coverage-badge = "^1.1.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-

@@ -3,7 +3,8 @@ from pydantic import BaseSettings, SecretStr
 
 class PublisherSettings(BaseSettings):
     # General publisher settings
-    publisher_publishers: set[str] = {"console", "file", "kafka", "s3", "gcs", "bigquery"}
+    publisher_publishers: set[str] = {"s3"}
+    # publisher_publishers: set[str] = {"console", "file", "s3", "gcs", "bigquery"}
     # Kafka publisher settings
     publisher_kafka_bootstrap_servers: str | list[str] = 'localhost:29092'
     publisher_kafka_client_id: str = "dd"
@@ -26,5 +27,6 @@ class PublisherSettings(BaseSettings):
     publisher_kafka_sasl_plain_username: str = None
     publisher_kafka_sasl_kerberos_service_name: str = 'kafka'
     publisher_kafka_sasl_kerberos_domain_name: str = None
+    publisher_s3_default_partition: str = 'default'
 
 

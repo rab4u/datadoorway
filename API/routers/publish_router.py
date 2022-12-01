@@ -63,7 +63,7 @@ class PublishRouter:
                                   default=Required,
                                   description="payload_category is like a topic, table or bucket or directory name."
                                               "Used when writing data to the destination",
-                                  regex=r"^[a-zA-Z][a-zA-Z0-9_]*$"
+                                  regex=r"^[a-zA-Z][a-zA-Z0-9_-]*$"
                               )
                               ) -> list[PublisherResponseModel]:
         """

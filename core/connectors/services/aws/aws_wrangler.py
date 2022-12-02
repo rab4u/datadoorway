@@ -78,5 +78,4 @@ class AWSWrangler():
         :rtype:
         """
         self._partition_type = partition_type if partition_type else self._partition_type
-        self._generate_params(payload_dict=payload_dict, s3_bucket=s3_bucket, s3_path=s3_path)
         return wr.s3.to_parquet(**self._generate_params(payload_dict=payload_dict, s3_bucket=s3_bucket, s3_path=s3_path))

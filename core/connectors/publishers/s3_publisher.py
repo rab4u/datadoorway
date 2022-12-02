@@ -24,5 +24,4 @@ class S3Publisher(PublisherInterface, AWSWrangler):
                                        s3_path=payload.payload_metadata.schema_id.split("/")[-1])
             return HTTPStatus.OK, str(f"Data has been stored to {response['paths']}")
         except Exception as ex:
-
             return HTTPStatus.INTERNAL_SERVER_ERROR, str(ex)

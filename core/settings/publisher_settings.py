@@ -4,6 +4,7 @@ from pydantic import BaseSettings, SecretStr
 class PublisherSettings(BaseSettings):
     # General publisher settings
     publisher_publishers: set[str] = {"console", "file", "kafka", "s3", "gcs", "bigquery"}
+
     # Kafka publisher settings
     publisher_kafka_bootstrap_servers: str | list[str] = 'localhost:29092'
     publisher_kafka_client_id: str = "dd"
@@ -26,5 +27,10 @@ class PublisherSettings(BaseSettings):
     publisher_kafka_sasl_plain_username: str = None
     publisher_kafka_sasl_kerberos_service_name: str = 'kafka'
     publisher_kafka_sasl_kerberos_domain_name: str = None
+
+    # File publisher settings
+    publisher_file_path: str = "./temp"
+    publisher_file_max_size: int = 10000
+    publisher_file_partition_enabled: bool = True
 
 

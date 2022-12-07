@@ -4,10 +4,9 @@ import re
 from functools import partial
 from http import HTTPStatus
 from pathlib import Path
-from threading import Lock
 
 import fastjsonschema
-from cachetools import TTLCache, cachedmethod, LRUCache
+from cachetools import cachedmethod, LRUCache
 from fastapi import HTTPException, Query
 from fastapi import Request
 from pydantic import Required
@@ -27,7 +26,6 @@ class SchemaValidations:
         :param settings: Setting Object
         """
         self.settings = settings
-        # self.cache = TTLCache(maxsize=self.settings.schema_cache_size, ttl=self.settings.schema_cache_ttl)
         SchemaValidations.cache = LRUCache(maxsize=self.settings.schema_cache_size)
 
     async def get_schema_file(self, schema_id) -> str:

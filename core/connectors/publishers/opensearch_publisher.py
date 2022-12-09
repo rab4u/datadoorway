@@ -20,11 +20,12 @@ class OpenSearchPublisher(PublisherInterface, AWSWrangler):
     async def send(self, destination: str, payload: PayloadModel) -> (int, str):
         try:
             self.logger.info(f"Saving Data to Opensearch")
-            response =  self.publish_to_open_search(payload_dict=payload.payload, index_name=payload.payload_metadata.event_category)
-            print(response)
+            response = self.publish_to_open_search(payload_dict=payload.payload,
+                                                    index_name=payload.payload_metadata.event_category)
             if response['errors']:
+                self.logger.error(','.join(response['errors']))
                 return HTTPStatus.BAD_REQUEST, str(f"Failed to Send the data {','.join(response['errors'])}")
             return HTTPStatus.OK, str(f"Data has been stored to ")
         except Exception as ex:
-            print(ex)
+            self.logger.error(ex)
             return HTTPStatus.INTERNAL_SERVER_ERROR, str(ex)

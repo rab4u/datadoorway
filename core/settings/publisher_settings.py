@@ -28,6 +28,12 @@ class PublisherSettings(BaseSettings):
     publisher_kafka_sasl_kerberos_service_name: str = 'kafka'
     publisher_kafka_sasl_kerberos_domain_name: str = None
 
+    #Opensearch Settings
+    publisher_opensearch_domain_host:str=None
+    publisher_opensearch_username:str=None
+    publisher_opensearch_password:str=None
+
+
     # File publisher settings
     publisher_file_path: str = "./temp"
     publisher_file_max_size: int = 10000

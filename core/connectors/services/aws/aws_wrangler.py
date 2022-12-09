@@ -86,12 +86,12 @@ class AWSWrangler():
                                                         s3_path=s3_path))
 
     def _opensearch_connect(self, host: str,username:str, password:str):
-        self._opensearch_client = wr.opensearch.connect(host=host,username="adithyapa",password="Hyp3r0n@123")
+        self._opensearch_client = wr.opensearch.connect(host=host,username=username,password=password)
 
     def publish_to_open_search(self, payload_dict: Dict, index_name: str) -> Any:
         if self._opensearch_client:
-            print(self._opensearch_client)
-            return wr.opensearch.index_df(client=self._opensearch_client, df=self._pandas_as_dict(payload_dict=payload_dict),
-                               index=index_name)
+            return wr.opensearch.index_df(client=self._opensearch_client,
+                                          df=self._pandas_as_dict(payload_dict=payload_dict),
+                                          index=index_name)
         else:
             raise Exception("OpenSearch Client Not initiated")

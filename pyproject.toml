@@ -14,11 +14,13 @@ pydantic = {extras = ["dotenv"], version = "^1.10.2"}
 enum34 = "^1.1.10"
 PyJWT = "^2.5.0"
 requests = "^2.28.1"
+jsonschema = {extras = ["format"], version = "^4.16.0"}
 watchfiles = "^0.18.0"
 aiokafka = "^0.8.0"
 cachetools = "^5.2.0"
 fastjsonschema = "^2.16.2"
-aiofiles = "^22.1.0"
+awswrangler = {extras = ["modin"], version = "^3.0.0rc2"}
+#ray = "^2.0.1"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^6.5.0"
@@ -28,4 +30,3 @@ coverage-badge = "^1.1.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-

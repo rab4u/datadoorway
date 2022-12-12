@@ -6,6 +6,7 @@ from core.connectors.publishers.file_publisher import FilePublisher
 from core.connectors.publishers.gcs_publisher import GCSPublisher
 from core.connectors.publishers.kafka_publisher import KafkaPublisher
 from core.connectors.publishers.s3_publisher import S3Publisher
+from core.connectors.publishers.opensearch_publisher import OpenSearchPublisher
 
 
 class PublishersMetadata(Enum):
@@ -15,6 +16,7 @@ class PublishersMetadata(Enum):
     FILE = FilePublisher
     GCS = GCSPublisher
     BIGQUERY = BigQueryPublisher
+    OPENSEARCH = OpenSearchPublisher
     # SNOWFLAKE = "snowflake"
     # REDSHIFT = "redshift"
 

@@ -20,6 +20,9 @@ poetry add fastapi
 export ENV_FILE=prod.env
 uvicorn main:app --reload --reload-include $ENV_FILE
 
+set ENV_FILE=prod.env
+uvicorn main:app --reload --reload-include $ENV_FILE
+
 # run pytest
 pytest
 

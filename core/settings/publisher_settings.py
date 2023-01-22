@@ -32,5 +32,3 @@ class PublisherSettings(BaseSettings):
     publisher_file_path: str = "./temp"
     publisher_file_max_size: int = 10000
     publisher_file_partition_enabled: bool = True
-
-

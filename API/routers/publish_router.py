@@ -1,3 +1,4 @@
+import asyncio
 from http import HTTPStatus
 from typing import Optional, List
 
@@ -5,7 +6,6 @@ from fastapi import APIRouter, Request, Body, Query
 from pydantic import Required
 
 from API.dependencies.publisher_dependencies import PublisherDependencies
-from API.metadata.publishers_metadata import PublishersMetadata
 from API.metadata.response_metadata import ResponseMetadata
 from API.metadata.paths_metadata import PathsMetadata
 from API.metadata.tags_metadata import TagsMetadata
@@ -23,7 +23,7 @@ class PublishRouter:
         Constructor for publish endpoint
         :param settings: environment settings
         :param dependencies: list dependencies for the path
-        :param publisher_objs: list of publisher objects
+        :param publishers: list of publisher objects
         """
         self.settings = settings
         self.publishers = publishers
@@ -82,20 +82,16 @@ class PublishRouter:
             payload=payload
         )
 
-        responses: list = []
-
-        for publisher in payload_metadata.publishers:
-            status, msg = await self.publishers[publisher].send(
-                destination=payload_metadata.event_category,
-                payload=enriched_payload)
-
-            responses.append(
-                PublisherResponseModel(
+        tasks = [
+                self.publishers[publisher].send(
                     publisher=publisher,
-                    status=status,
-                    destination=payload_category,
-                    message=msg
-                )
-            )
+                    destination=payload_metadata.event_category,
+                    payload=enriched_payload,
+                    timeout=self.settings.publisher_timeout
+                ) for publisher in payload_metadata.publishers
+        ]
+
+        futures = await asyncio.gather(*tasks)
+        responses = [fut for fut in futures]
 
         return responses

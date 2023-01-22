@@ -13,7 +13,7 @@ class GCSPublisher(PublisherInterface):
     async def stop(self):
         pass
 
-    async def send(self, destination: str, payload: PayloadModel):
+    async def send(self, publisher: str, destination: str, payload: PayloadModel, timeout: int):
         pass
 
 

@@ -1,5 +1,8 @@
+from http import HTTPStatus
+
 from core.connectors.publishers.publisher_interface import PublisherInterface
 from core.models.payload_model import PayloadModel
+from core.models.publisher_response_model import PublisherResponseModel
 
 
 class BigQueryPublisher(PublisherInterface):
@@ -13,8 +16,13 @@ class BigQueryPublisher(PublisherInterface):
     async def stop(self):
         pass
 
-    async def send(self, destination: str, payload: PayloadModel):
-        return payload
+    async def send(self, publisher: str, destination: str, payload: PayloadModel, timeout: int):
+        return PublisherResponseModel(
+            publisher=publisher,
+            status=HTTPStatus.OK,
+            destination=destination,
+            message="success"
+        )
 
 
 

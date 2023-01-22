@@ -45,11 +45,14 @@ def initialize_routers(settings: Settings):
 
 async def initialize_publishers(settings: Settings):
     for publisher in settings.publisher_publishers:
-        pub = PublishersMetadata.__getitem__(publisher.upper())\
+        pub = PublishersMetadata.__getitem__(publisher.upper()) \
             .value(params=settings.get_settings(prefix=f"publisher_{publisher}_"))
-        await pub.start()
-        publishers[publisher] = pub
-        logger.info(f"Initialized {pub.__class__.__name__} successfully")
+        try:
+            publishers[publisher] = pub
+            await pub.start()
+            logger.info(f"Initialized {pub.__class__.__name__} successfully")
+        except Exception as e:
+            logger.error(f"Initialization {pub.__class__.__name__} failed")
 
 
 @app.on_event("startup")

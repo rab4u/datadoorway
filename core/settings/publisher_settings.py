@@ -4,6 +4,7 @@ from pydantic import BaseSettings, SecretStr
 class PublisherSettings(BaseSettings):
     # General publisher settings
     publisher_publishers: set[str] = {"console", "file", "kafka", "s3", "gcs", "bigquery"}
+    publisher_timeout: int = 180
 
     # Kafka publisher settings
     publisher_kafka_bootstrap_servers: str | list[str] = 'localhost:29092'

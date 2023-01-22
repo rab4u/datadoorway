@@ -26,7 +26,7 @@ class HelloWorldUser(HttpUser):
             url="http://localhost:8000/publish",
             params={
                 "payload_category": "android",
-                "publishers": ["file"],
+                "publishers": ["file", "kafka"],
                 "schema_id": "users/mobile/android"
             },
             data=json.dumps(self.data),
@@ -35,22 +35,22 @@ class HelloWorldUser(HttpUser):
             name="http://localhost:8000",
         )
 
-    # @task
-    # def publish_ios(self):
-    #     random_number = randint(1, 99)
-    #     self.data['age'] = random_number
-    #     resp = self.client.post(
-    #         url="http://localhost:8000/publish",
-    #         params={
-    #             "payload_category": "ios",
-    #             "publishers": ["file"],
-    #             "schema_id": "users/mobile/ios"
-    #         },
-    #         data=json.dumps(self.data),
-    #         auth=None,
-    #         headers={"authorization": "Bearer " + self.token},
-    #         name="http://localhost:8000",
-    #     )
+    @task
+    def publish_ios(self):
+        random_number = randint(1, 99)
+        self.data['age'] = random_number
+        resp = self.client.post(
+            url="http://localhost:8000/publish",
+            params={
+                "payload_category": "ios",
+                "publishers": ["file"],
+                "schema_id": "users/mobile/ios"
+            },
+            data=json.dumps(self.data),
+            auth=None,
+            headers={"authorization": "Bearer " + self.token},
+            name="http://localhost:8000",
+        )
 
     # @task
     # def hello_world(self):

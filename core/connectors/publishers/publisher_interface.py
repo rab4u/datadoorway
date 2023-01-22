@@ -13,5 +13,5 @@ class PublisherInterface:
         pass
 
     @abstractmethod
-    async def send(self, destination: str, payload: PayloadModel):
+    async def send(self, publisher: str, destination: str, payload: PayloadModel, timeout: int):
         pass

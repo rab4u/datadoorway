@@ -50,7 +50,7 @@ class Settings(
     async def get_setting(self, key) -> any:
         """
         Gets the setting related to the key
-        :param key: key of the environment variable
+        :param key: environment variable name
         :return:
         """
         return getattr(self, key.lower())
